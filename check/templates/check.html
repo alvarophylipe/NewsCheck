@@ -1,0 +1,49 @@
+{% extends 'global/layout.html' %}
+{% load static %}
+{% block content %}
+
+<section class="container">
+    <div class="px-5 my-3 mx-5 mb-5">
+        <p class="poppins-medium h3">
+            Conecte-se à realidade com um filtro aguçado e fontes confiáveis. 🕵️
+        </p>
+    </div>
+    <div class="px-5 my-4">
+        <form class="row justify-content-center justify-content-lg-start forms ps-lg-3" method="post">
+            {% csrf_token %}
+            <div class="col-md-12 poppins-medium my-4 block-text p-3 p-lg-2 rounded-2 h-100 col-lg-9 row m-lg-0">
+                <select class="form-select select-custom poppins-medium text-center col-lg-3 border-2" name="type" id="type" required>
+                    <option selected value="text">Texto</option>
+                    <option value="link">Link</option>
+                </select>
+                <input id="text" type="text" name="text" class="col-lg-7 rounded-2 poppins-regular m-lg-0 h-75 mt-2 ps-3 p-2 p-lg-2 text-input-custom ms-lg-2 border-custom" placeholder="Cole o texto aqui..." name="text" autocomplete="off" required>
+            </div>
+            <div class="col-md-12 d-md-flex justify-content-end p-0 col-lg-3 px-lg-3 m-lg-0 loading-btn">
+                <button id="loadingButton" type="submit" class="btn border-0 gradient-custom w-100">
+                    <img src="{% static "global/img/send.svg" %}" alt="Enviar" id="sendImg">
+                    <div class="spinner-border text-light hidden" id="spinner"></div>
+                </button>
+            </div>
+            <div id="backgroundAnimation"></div>
+        </form>
+    </div>
+    <div class="text-center poppins-medium m-4 p-3 mx-5" id="outputContent">
+        <!-- Resultado da previsão aqui -->
+        <div class="px-5 mx-5" id="loadingBar">
+            <p class="text-center">Carregando o modelo</p>
+            <div class="progress">
+                <div class="progress-bar gradient-custom" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    </div>
+    <div class="mx-5">
+        <h5 class="h6 color-gray-dark">
+            <b>Como funciona?</b>
+        </h5>
+        <p class="font-size-custom text-justify color-gray-medium w-100">
+            O Inspector é como um amigo inteligente que compreende palavras de maneira única. Através de um treinamento especial, ele aprendeu o contexto das palavras e como eles se encaixam em diferentes situações. Ao enviar suas notícias, ele não apenas analisa palavras isoladas, mas entende o contexto para fornecer respostas personalizadas e úteis. Imagine ter uma conversa com um amigo que sempre tem as informações certas. Assim é o Inspector, tornando sua interação mais fácil e amigável!
+        </p>
+    </div>
+</section>
+
+{% endblock %}

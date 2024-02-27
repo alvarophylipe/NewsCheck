@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="{% static 'global/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'global/css/style.css' %}" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>NewsCheck</title>
+</head>
+<body class="d-flex flex-column min-vh-100 px-md-5 mx-md-5">
+  <nav class="navbar bg-white-custom navbar-expand-md m-md-5 mt-4 px-5">
+    <div class="container p-0">
+      <a href="#" class="navbar-brand poppins-bold">NewsCheck</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavbar">
+        <spam class="navbar-toggler-icon"></spam>
+      </button>
+      <div class="collapse navbar-collapse d-lg-flex justify-content-md-end" id="menuNavbar">
+        <div class="navbar-nav text-center poppins-bold">
+          <a href="/" class="nav-link mx-5">Checar</a>
+          <a href="/sobre/" class="nav-link">Sobre</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}
+
+  {% endblock %}
+
+  <footer class="container mt-auto py-3">
+    <p class="text-center text-body-secondary poppins-medium">
+      ALVARO PHYLIPE &copy; 2024
+    </p>
+  </footer>
+  <script src="{% static 'global/js/bootstrap.bundle.min.js' %}" ></script> 
+  <script src="{% static 'global/js/main.js' %}" ></script> 
+</body>
+</html>

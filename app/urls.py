@@ -21,3 +21,6 @@ urlpatterns = [
     path("sobre/", include('sobre.urls')),
     
 ]
+
+handler404 = "check.views.custom_404_handler"
+

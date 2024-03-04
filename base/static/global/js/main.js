@@ -1,8 +1,9 @@
 // Static class for user interface interactions
 class UIHandler {
-    static input = document.getElementById("text");
+    static input = document.getElementById("content");
     static backgroundAnimation = document.getElementById("backgroundAnimation");
     static output = document.getElementById("outputContent");
+    static btn = document.getElementById("loadingButton")
 
     // Change the placeholder of the text input base on the selected type
     static changePlaceholder(type) {
@@ -12,12 +13,21 @@ class UIHandler {
 
     // Display the result on the user interface
     static showResult(result) {
-        
-        const trueLabelText = "Me parece verdadeira! 👍 É sempre bom verificar antes de divulgar, que tal buscar outras fontes?";
-        const fakeLabelText = "Hmm... Pode ser falsa! 👎 Verifique com fontes confiáveis!";
+        let outputText;
 
-        this.output.innerHTML = result === 1 ? fakeLabelText : trueLabelText;
-        this.output.classList.remove('hidden')
+        switch(result) {
+            case 0:
+                outputText = "Me parece verdadeira! 👍 É sempre bom verificar antes de divulgar, que tal buscar outras fontes?";
+                this.output.classList.add('border-true');
+                break;
+            case 1:
+                outputText = "Hmm... Pode ser falsa! 👎 Verifique com fontes confiáveis!";
+                this.output.classList.add('border-fake');
+                break;
+        }
+
+        this.output.innerHTML = outputText;
+        this.output.classList.remove('hidden');
 
         UIHandler.addBackgroundAnimation(result);
     }
@@ -61,22 +71,125 @@ class UIHandler {
     }
 
     // Show request error
-    static showRequestError() {
-        const reqErrorText = "Parece que estou com um problema. 🛠️ Tente novamente mais tarde!";
+    static showRequestError(response) {
+        var reqErrorText = response.status == 503 ? "Parece que estou em manutenção. 🛠️ Tente novamente mais tarde!" : "Parece que algo deu errado. 🛠️ Tente novamente mais tarde!";
         this.output.innerHTML = reqErrorText;
-        this.output.classList.remove('hidden')
+        this.output.classList.add('border-error');
+        this.output.classList.remove('hidden');    
     }
 
+    static removeOutputBorder() {
+        this.output.classList.add('hidden');
+        this.output.innerHTML = '';
+        this.output.classList.remove('border-true', 'border-fake', 'border-error');
+    }
+
+    static loadProgressBarAnimation() {
+        this.btn.disabled = true;
+
+        this.output.classList.remove('hidden')
+
+        var mainDiv = document.createElement("div");
+        mainDiv.classList.add("px-5", "mx-5");
+
+        var p = document.createElement("p");
+        p.textContent = "Carregando o modelo";
+        mainDiv.appendChild(p);
+
+        var progressDiv = document.createElement("div");
+        progressDiv.classList.add("progress");
+
+        var progressBarDiv = document.createElement("div");
+        progressBarDiv.classList.add("progress-bar", "gradient-custom");
+        progressBarDiv.role = "progressbar";
+
+        progressDiv.appendChild(progressBarDiv);
+
+        mainDiv.appendChild(progressDiv);
+
+        this.output.appendChild(mainDiv);
+
+        setTimeout(() => {
+            this.output.removeChild(mainDiv);
+            this.btn.disabled = false;
+        }, 20000)
+    }
+
+    static navBarItemActive() {
+        const activeItem = document.querySelector('a[href="'+ window.location.pathname +'"]');
+        activeItem.setAttribute('active', 'true');
+    }
 }
 
-class ModelRequester
+class Predictor {
+    static async load() {
+        try {
+            const response = await fetch('/check/load_model', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "load": true
+                }),
+            })
+
+            if (!response.ok) {
+                const errorDetails = await response.json()
+                UIHandler.showRequestError(response)
+                throw new Error(`Server returned ${response.status}: ${errorDetails.message}`)
+            }
+
+            const data = await response.json()
+            console.log(data)
+            if (data.loading) {
+                UIHandler.loadProgressBarAnimation();
+            }
+
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+    static async predict(type, content) {
+        UIHandler.showSpinner();
+        UIHandler.removeBackgroundAnimation();
+        UIHandler.removeOutputBorder();
+
+        try {
+            const response = await fetch('/check/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'type': type,
+                    'content': content
+                })
+            })
+             
+            if (!response.ok) {
+                const errorDetails = await response.json();
+                UIHandler.showRequestError(response)
+                throw new Error(`Server returned ${response.status}: ${errorDetails.message}`);
+            }
+
+            const data = await response.json();
+            UIHandler.showResult(data.prediction);
+        } catch(error) {
+            console.log(error);
+        } finally {
+            UIHandler.hideSpinner();
+        }
+    }
+}
 
 // Class responsible for form validation and handling
 class FormValidation {
     constructor() {
         // Get references to elements and initialize events
         this.form = document.querySelector('.forms');
-        this.inputText = document.querySelector("#text")
+        this.inputText = document.querySelector("#content")
         this.events();
     }
 
@@ -93,53 +206,36 @@ class FormValidation {
     // Handle form submission
     handleSubmit(e) {
         e.preventDefault();
-        const typeInput = document.getElementById("type").value;
-        
-        // try{
-            // Determine validation type
-            if (typeInput === 'link') {
-                this.submitLinkType();
-            } else {
-                this.submitTextType();
-            }
-        // } catch {
-        //     UIHandler.showRequestError();
-        //     UIHandler.hideSpinner();
-        // }
-    }
-
-    // Handle form submission for text type
-    submitTextType(){
         UIHandler.removeErrorText();
 
-        const text = document.getElementById("text");
-        const words = this.countWords(text.value);
-
-        if (words < 30) {
-            UIHandler.createError(text, 'Texto muito pequeno.');
-            UIHandler.hideSpinner();
-            return;
+        const typeInput = document.getElementById("type").value;
+        const contentInput = document.getElementById("content");
+        
+        if (typeInput === 'link') {
+            this.linkValidation(contentInput)
+        } else {
+            this.textValidation(contentInput);
         }
-
-        UIHandler.showSpinner();
-        this.submitForm('text', text.value);
-
     }
 
-    // Handle form submission for link type
-    submitLinkType() {
-        UIHandler.removeErrorText()
-
-        const link = document.getElementById("text");
-
-        if (!this.isLink(link.value)) {
-            UIHandler.createError(link, 'Insira um link válido.');
+    textValidation(content){
+        const words = this.countWords(content.value);
+        
+        if (words < 30) {
+            UIHandler.createError(content, 'Este texto é muito pequeno.');
             return;
         }
-        
-        UIHandler.showSpinner();
-        this.submitForm('link', link.value)
 
+        Predictor.predict('text', content.value)
+    }
+
+    linkValidation(content){
+        if (!this.isLink(content.value)){
+            UIHandler.createError(content, "Link Inválido.")
+            return;
+        }
+
+        Predictor.predict('link', content.value)
     }
 
     // Check if the text is a valid link
@@ -153,57 +249,16 @@ class FormValidation {
         return text.trim().split(/\s+/).length;
     } 
 
-    // Submit the form via a fetch request
-    submitForm(type, text) {
-        UIHandler.showSpinner();
-        UIHandler.removeBackgroundAnimation();
-
-        fetch('/check/process', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                "type": type,
-                "content": text
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            UIHandler.showResult(data.prediction);
-            UIHandler.hideSpinner();
-        })
-        .catch(() => {
-            UIHandler.showRequestError();
-            UIHandler.hideSpinner();
-        })
-    }
 }
 
 // Execution
-const validate = new FormValidation();
-document.getElementById("type").addEventListener("change", (event) => UIHandler.changePlaceholder(event.target.value));
 
-// const progressBar = document.querySelector('.progress-bar');
+if (window.location.pathname === '/') {
+    const validate = new FormValidation();
+    document.getElementById("type").addEventListener("change",
+                        (event) => UIHandler.changePlaceholder(event.target.value));
+    Predictor.load();
+}
 
-// function animateProgressBar(duration) {
-//   let progress = 0;
-
-//   const interval = setInterval(() => {
-//     progress += (100 / duration); // Ajusta o incremento de acordo com a duração
-//     progressBar.style.width = `${progress}%`;
-//     progressBar.setAttribute('aria-valuenow', progress);
-
-//     if (progress === 100) {
-//       clearInterval();
-//     }
-//   }, 1000);
-// }
-
-// animateProgressBar(20);
-
-const load_bar = document.getElementById('outputContent');
-
-setTimeout(() => {
-    load_bar.classList.add("hidden")
-}, 20000);
+window.onload = () => UIHandler.navBarItemActive();
+window.onhashchange = () => UIHandler.navBarItemActive();

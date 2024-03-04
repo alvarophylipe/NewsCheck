@@ -7,6 +7,7 @@
     --color-blue-one: #8AC6E8;
     --color-blue-two: #8AC6E8;
     --color-blue-three: #15A8FA;
+    --color-black-one: #131313;
 }
 
 
@@ -60,6 +61,11 @@
 
 .loading-btn:hover {
     filter: brightness(0.9);
+}
+
+.loading-btn:disabled {
+    background: var(--color-gray-two);
+    cursor: default,
 }
 
 .hidden {
@@ -134,4 +140,28 @@
     100% {
         width: 100%;
     }
+}
+
+a {
+    color: var(--color-gray-one);
+}
+
+a[active='true'] {
+    color: var(--color-black-one);
+    font-size: 18px;
+}
+
+.border-true {
+    border: 3px dashed var(--color-true);
+    border-radius: 1rem;
+}
+
+.border-fake {
+    border: 3px dashed var(--color-fake);
+    border-radius: 1rem;
+}
+
+.border-error {
+    border: 3px dashed var(--color-black-one);
+    border-radius: 1rem;
 }

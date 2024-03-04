@@ -9,7 +9,7 @@
 </div>
 
 <p>
-NewsCheck é uma ferramenta que utiliza o fine-tuning de um modelo BERT em português, o <a href="https://github.com/neuralmind-ai/portuguese-bert">BERTIMBAU</a>. O foco da afinação foi treinar o modelo para discernir a linguagem usada para transmitir informações incorretas, a fim de induzir o leitor ao erro. Mais informações do treinamento, <a href="https://github.com/alvarophylipe/NewsCheck-training">acesse aqui.</a>
+NewsCheck é uma ferramenta que utiliza o fine-tuning de um modelo BERT em português, o <a href="https://github.com/neuralmind-ai/portuguese-bert">BERTIMBAU</a>. O foco da afinação foi treinar o modelo para discernir a linguagem usada para transmitir informações incorretas, a fim de induzir o leitor ao erro. Mais informações do treinamento, <a href="https://colab.research.google.com/drive/1WGOjSBWCPqWHxidmdi_dIrohjYNgyQyL?usp=sharing">acesse aqui.</a>
 </p>
 <p>
 O Modelo foi treinado usando dados coletados de portais de notícias, mas precisamente o <a href="https://github.com/jpchav98/FakeTrue.Br">faketrue.br</a>. Mais informações sobre o como foi coletado e tratado os dados, <a href="https://sol.sbc.org.br/index.php/erbd/article/view/24352"> acesse o artigo.</a>

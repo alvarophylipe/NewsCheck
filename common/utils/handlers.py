@@ -85,7 +85,7 @@ class RequestModelHandler:
         loading = True
 
         if self._result().get('prediction'):
-            loading = False
+            loading = True
         
         return {
             "content": json.dumps({

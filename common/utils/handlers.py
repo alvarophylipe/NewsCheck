@@ -1,10 +1,8 @@
 import os
 import json
 import requests
-from dotenv import load_dotenv
 from common.utils.web_extractor import get_webpage_content
 
-load_dotenv()
 
 class RequestModelHandler:
     def __init__(self) -> None:

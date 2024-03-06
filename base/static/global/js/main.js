@@ -90,7 +90,7 @@ class UIHandler {
         this.output.classList.remove('hidden')
 
         var mainDiv = document.createElement("div");
-        mainDiv.classList.add("px-5", "mx-5");
+        mainDiv.classList.add("px-0", "mx-0", "px-lg-5", "mx-lg-5");
 
         var p = document.createElement("p");
         p.textContent = "Carregando o modelo";

@@ -83,8 +83,10 @@ class RequestModelHandler:
         self.content = content
 
         loading = True
-
-        if self._result().get('prediction'):
+        try:
+            if self._result().get('prediction'):
+                loading = False
+        except:
             loading = True
         
         return {
